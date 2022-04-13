@@ -5,9 +5,9 @@
   SDA --> GPIO21
   SCL (SCK) --> GPIO22
   PLUVIOMETRO --> GPIO27 (Pull-Down externo)
-
 */
 #include <WiFi.h>
+#include <WiFiMulti.h>
 #include <HTTPClient.h>
 #include <Adafruit_BME280.h>
 #include <Adafruit_ADS1X15.h>
@@ -17,7 +17,6 @@
 
 #define POWER 23
 #define ELEVACION 25.0
-//#define VPIN 36
 #define VBATPIN 36
 #define DIVISORTENSION 2
 #define MULTVOLT 0.125F
@@ -30,9 +29,10 @@
 
 Adafruit_BME280 bme; // I2C : D21 --> SDA  D22 --> SCL
 Adafruit_ADS1115 ads; // I2C Dir: 0x48
+WiFiMulti wifiMulti;
 // Set our wifi name and password
-const char* ssid = "AJOIR";
-const char* password = "riquilante";
+//const char* ssid = "AJOIR";
+//const char* password = "riquilante";
 
 //const char* ssid = "AULA27";
 //const char* password = "";
@@ -61,21 +61,22 @@ void setup() {
   Serial.println(humedad);
   Serial.println(vBat); 
   enciendeWiFi();  
-  WiFi.begin(ssid, password); // Attempt to connect to wifi with our password
+  //WiFi.begin(ssid, password); // Attempt to connect to wifi with our password
   byte notConnectedCounter = 1;
-  while (WiFi.status() != WL_CONNECTED) {
+  wifiMulti.addAP("COCO", "12345678");
+  wifiMulti.addAP("AJOIR", "riquilante");
+  //wifiMulti.addAP("AJOIRr", "riquilante");
+  while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print("Conectando a la wifi. Intento Nº : ");
     Serial.println(notConnectedCounter);
     delay(500);    
     notConnectedCounter++;
-    if(notConnectedCounter > 50) { // Reset board if not connected after 25s
+    if(notConnectedCounter > 50) { // Resetear placa a los 50 intentos
         Serial.println("Reinicio debido a la imposibilidad de conectar a la wifi.");
         ESP.restart();
     }
   } 
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("");  Serial.println("WiFi connected: ");  Serial.println(WiFi.SSID());  Serial.println("IP address: ");  Serial.println(WiFi.localIP());
 
   if(WiFi.status()== WL_CONNECTED){ // Check to make sure wifi is still connected
     Serial.println("Enviando datos por Wifi");
