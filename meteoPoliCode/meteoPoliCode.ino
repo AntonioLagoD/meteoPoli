@@ -19,7 +19,7 @@
 #define ELEVACION 25.0
 #define VBATPIN 36
 #define DIVISORTENSION 2
-#define MULTVOLT 0.125F
+//#define MULTVOLT 0.125F
 //#define PROBANDO
 #if defined(PROBANDO)
   #define INTERVALO 20  // Segundos
@@ -65,6 +65,8 @@ void setup() {
   byte notConnectedCounter = 1;
   wifiMulti.addAP("COCO", "12345678");
   wifiMulti.addAP("AJOIR", "riquilante");
+  wifiMulti.addAP("AULA27", "");
+  wifiMulti.addAP("AULA26", "");
   //wifiMulti.addAP("AJOIRr", "riquilante");
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print("Conectando a la wifi. Intento Nº : ");
