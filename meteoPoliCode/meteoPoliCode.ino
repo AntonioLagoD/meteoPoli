@@ -63,6 +63,8 @@ void setup() {
   wifiMulti.addAP("AJOIR", "riquilante");
   wifiMulti.addAP("AULA27", "");
   wifiMulti.addAP("AULA26", "");
+  wifiMulti.addAP("PARANINFO", "p0l1t3cn1c0");
+  wifiMulti.addAP("Sala Profes", "salapr0f3s");
   //wifiMulti.addAP("AJOIRr", "riquilante");
   while (wifiMulti.run() != WL_CONNECTED) {
     Serial.print("Conectando a la wifi. Intento Nº : ");
