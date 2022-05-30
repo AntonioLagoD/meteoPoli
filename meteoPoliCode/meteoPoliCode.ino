@@ -19,7 +19,6 @@
 #define ELEVACION 25.0
 #define VBATPIN 36
 #define DIVISORTENSION 2
-//#define MULTVOLT 0.125F
 //#define PROBANDO
 #if defined(PROBANDO)
   #define INTERVALO 20  // Segundos
@@ -30,36 +29,33 @@
 Adafruit_BME280 bme; // I2C : D21 --> SDA  D22 --> SCL
 Adafruit_ADS1115 ads; // I2C Dir: 0x48
 WiFiMulti wifiMulti;
-// Set our wifi name and password
-//const char* ssid = "AJOIR";
-//const char* password = "riquilante";
-
-//const char* ssid = "AULA27";
-//const char* password = "";
 
 String serverName = "https://api.thingspeak.com/update?api_key=ZNPZIIHCRQ2P4VIX";
 
 void setup() {
-  //delay(500); // Probando si esto evita el cuelgue
   apagaWiFi();
   pinMode(POWER, OUTPUT);
   digitalWrite(POWER,HIGH);
   Serial.begin(115200);
   ads.begin();
-  ads.setGain(GAIN_ONE);    
+  ads.setGain(GAIN_ONE);
+  Serial.println("Estación meteorolóxica do IES Politécnico de Vigo");
   if (!bme.begin()) bmeError();
-  else Serial.print("BME 280 - SensorID : 0x"); Serial.println(bme.sensorID(),16);
+    else Serial.print("BME 280 - SensorID : 0x"); Serial.println(bme.sensorID(),16);
   configura();
   bme.takeForcedMeasurement();
   float temperatura = bme.readTemperature();
   float pre = bme.readPressure() / 100.0F;
   float presion = bme.seaLevelForAltitude(ELEVACION, pre);
   float humedad=bme.readHumidity();
-  float vBat=mideTension(); 
-  Serial.println(temperatura);
-  Serial.println(presion);
-  Serial.println(humedad);
-  Serial.println(vBat); 
+  float vBat=mideTension();
+  int dir= dirViento();
+  Serial.println("Temperatura(ºC)\tPresión(hPa)\tHumedad\tV Batería\tDirección");  
+  Serial.print(temperatura);Serial.print("\t");
+  Serial.print(presion);Serial.print("\t");
+  Serial.print(humedad);Serial.print("\t");
+  Serial.print(vBat);Serial.print("\t");
+  Serial.println(dir); 
   enciendeWiFi();  
   //WiFi.begin(ssid, password); // Attempt to connect to wifi with our password
   byte notConnectedCounter = 1;
@@ -82,7 +78,7 @@ void setup() {
 
   if(WiFi.status()== WL_CONNECTED){ // Check to make sure wifi is still connected
     Serial.println("Enviando datos por Wifi");
-    sendData(temperatura,presion,humedad,vBat); // Call the sendData function defined below
+    sendData(temperatura,presion,humedad,vBat,dir); // Call the sendData function defined below
   }
   else Serial.println("Wifi Desconectada");  
 
@@ -108,9 +104,9 @@ void bmeError()
     Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n"); Serial.print("        ID of 0x60 represents a BME 280.\n");  Serial.print("        ID of 0x61 represents a BME 680.\n");    
 }
 
-void sendData(double temp, double pres, double hum, double vbat){
+void sendData(double temp, double pres, double hum, double vbat,int dir){
   HTTPClient http; // Initialize our HTTP client
-  String url = serverName + "&field1=" + temp + "&field2=" + pres + "&field3=" + hum + "&field4=" + vbat; // Define our entire url
+  String url = serverName + "&field1=" + temp + "&field2=" + pres + "&field3=" + hum + "&field4=" + vbat + "&field5=" + dir; 
   http.begin(url.c_str()); // Initialize our HTTP request
   int httpResponseCode = http.GET(); // Send HTTP request
   Serial.print("Respuesta HTTP: ");
@@ -120,10 +116,10 @@ void sendData(double temp, double pres, double hum, double vbat){
 
 void configura() {
       bme.setSampling(Adafruit_BME280::MODE_FORCED,
-                    Adafruit_BME280::SAMPLING_X1, // temperature
-                    Adafruit_BME280::SAMPLING_X1, // pressure
-                    Adafruit_BME280::SAMPLING_X1, // humidity
-                    Adafruit_BME280::FILTER_OFF   );
+                      Adafruit_BME280::SAMPLING_X1, // temperature
+                      Adafruit_BME280::SAMPLING_X1, // pressure
+                      Adafruit_BME280::SAMPLING_X1, // humidity
+                      Adafruit_BME280::FILTER_OFF);
 }
 void apagaWiFi(){
     WiFi.disconnect(true);  // Desconecta de la red
@@ -136,9 +132,18 @@ void enciendeWiFi(){
 float mideTension(){
   int acumulado = 0;
   int i=1;
-  for (i=1;i<=50;i++) {
+  for (i=1;i<=20;i++) {
     acumulado+= ads.readADC_SingleEnded(0);
     delay(10);  
     }
   return(DIVISORTENSION*ads.computeVolts(acumulado/i));  
+}
+float dirViento(){
+  int acumulado = 0;
+  int i=1;
+  for (i=1;i<=20;i++) {
+    acumulado+= ads.readADC_SingleEnded(2);
+    delay(10);  
+    }
+  return(map((acumulado/i),0,32767,0,359));  
 }
