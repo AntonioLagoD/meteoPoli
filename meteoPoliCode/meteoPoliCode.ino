@@ -5,7 +5,7 @@
   SDA --> GPIO21
   SCL (SCK) --> GPIO22
   PLUVIOMETRO --> GPIO27 (Pull-Down externo)
-  Anemómetro 
+  Anemómetro --> GPIO25 v=2,25*pulsos/Tiempo(s) (mph) = 3,62*pulsos/Tiempo(s) (km/h)
 */
 #include <WiFi.h>
 #include <WiFiMulti.h>
@@ -98,7 +98,7 @@ void setup() {
     subeDatos(temperatura,presion,humedad,vBat,dir,vel); 
   }
   else Serial.println("Wifi Desconectada");  
-
+  detachInterrupt(digitalPinToInterrupt(ANEMOMETRO));
   apagaWiFi();
   digitalWrite(POWER,LOW);
   pinMode(POWER,INPUT);
