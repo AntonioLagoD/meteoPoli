@@ -63,10 +63,10 @@ void setup() {
   
  
   enciendeWiFi();  
-  byte notConnectedCounter = 1;  
-  wifiMulti.addAP("humanidades", "p0l1t3cn1c0");
-  wifiMulti.addAP("biblioteca", "biblioteca");
+  byte notConnectedCounter = 1; 
   wifiMulti.addAP("PARANINFO", "p0l1t3cn1c0");
+  wifiMulti.addAP("biblioteca", "biblioteca");
+  //wifiMulti.addAP("humanidades", "p0l1t3cn1c0");
   //wifiMulti.addAP("COCO", "12345678");
   //wifiMulti.addAP("AJOIR", "riquilante");
   //wifiMulti.addAP("AULA27", "");
