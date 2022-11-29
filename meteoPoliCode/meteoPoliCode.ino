@@ -35,7 +35,7 @@ Adafruit_ADS1115 ads; // I2C Dir: 0x48
 WiFiMulti wifiMulti;
 
 int pulsos=0;
-String serverName = "https://api.thingspeak.com/update?api_key=ZNPZIIHCRQ2P4VIX";
+String serverName = "https://api.thingspeak.com/update?api_key=XXXXXXXXXXXXXXXX";
 
 //////////////////////////////////////////////////////////////////////
 
